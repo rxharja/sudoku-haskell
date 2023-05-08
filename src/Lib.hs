@@ -1,10 +1,12 @@
 module Lib (Grid, Row, rows, cols, boxes, valid, solve) where
 
-import Data.List (transpose)
+import Data.List (delete, transpose)
 
 type Grid = Matrix Value
 
 type Matrix a = [Row a]
+
+type Choices = [Value]
 
 type Row a = [a]
 
@@ -33,8 +35,22 @@ nodups [] = True
 nodups (x : xs) = notElem x xs && nodups xs
 
 solve :: Grid -> [Grid]
-solve = filter valid . collapse . choices
+solve = filter valid . explode . fix prune . choices
 
-choices = undefined
+choices :: Grid -> Matrix Choices
+choices = map (map choice) where choice v = if v == '.' then ['1' .. '9'] else [v]
 
-collapse = undefined
+explode :: Matrix [a] -> [Matrix a]
+explode m = cp (map cp m)
+  where
+    cp [] = [[]]
+    cp (xs : xss) = [y : ys | y <- xs, ys <- cp xss]
+
+prune :: Matrix Choices -> Matrix Choices
+prune = pruneBy boxes . pruneBy cols . pruneBy rows
+  where
+    pruneBy f = f . map reduce . f
+    reduce = undefined
+
+fix :: Eq a => (a -> a) -> a -> a
+fix f x = if x == x' then x else fix f x' where x' = f x

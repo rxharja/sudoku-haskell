@@ -1,4 +1,4 @@
-import Lib (Grid, boxes, cols, rows, valid)
+import Lib (Grid, Row, boxes, cols, rows, valid)
 import Test.Hspec
 import Test.QuickCheck
 
@@ -18,10 +18,8 @@ easy =
     "4..25...."
   ]
 
-genRow :: Gen [Char]
-genRow = do
-  let els = concat ("." : map show ([1 .. 9] :: [Int]))
-  vectorOf 9 (elements els)
+genRow :: Gen (Row Char)
+genRow = vectorOf 9 $ elements ('.' : ['1' .. '9'])
 
 genGrid :: Gen Grid
 genGrid = vectorOf 9 genRow
