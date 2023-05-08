@@ -27,13 +27,13 @@ genGrid :: Gen Grid
 genGrid = vectorOf 9 genRow
 
 prop_rows :: Property
-prop_rows = forAll genGrid $ \x -> (rows . rows) x == x
+prop_rows = forAll genGrid $ (==) <*> rows . rows
 
 prop_cols :: Property
-prop_cols = forAll genGrid $ \x -> (cols . cols) x == x
+prop_cols = forAll genGrid $ (==) <*> cols . cols
 
 prop_boxes :: Property
-prop_boxes = forAll genGrid $ \x -> (boxes . boxes) x == x
+prop_boxes = forAll genGrid $ (==) <*> boxes . boxes
 
 main :: IO ()
 main = hspec $ do
