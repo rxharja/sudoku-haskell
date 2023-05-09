@@ -1,4 +1,4 @@
-import Lib (Grid, Row, boxes, cols, rows, valid)
+import Lib (Grid, Row, boxes, cols, rows, solve, valid)
 import Test.Hspec
 import Test.QuickCheck
 
@@ -42,3 +42,5 @@ main = hspec $ do
       quickCheck prop_cols
     it "Applying boxes twice on a grid should be the same as applying identity" $ do
       quickCheck prop_boxes
+    it "Solving the easy solution should produce exactly one valid solution" $ do
+      print (solve easy)

@@ -12,6 +12,9 @@ type Row a = [a]
 
 type Value = Char
 
+singleton :: [a] -> Bool
+singleton xs = length xs == 1
+
 rows :: Matrix a -> [Row a]
 rows = id
 
@@ -49,8 +52,10 @@ explode m = cp (map cp m)
 prune :: Matrix Choices -> Matrix Choices
 prune = pruneBy boxes . pruneBy cols . pruneBy rows
   where
-    pruneBy f = f . map reduce . f
-    reduce = undefined
+    pruneBy f = f . map eliminate . f
+    eliminate xss =
+      let singles = (map head . filter singleton) xss
+       in [xs' | xs <- xss, let xs' = if singleton xs then xs else foldr delete xs singles]
 
 fix :: Eq a => (a -> a) -> a -> a
 fix f x = if x == x' then x else fix f x' where x' = f x
