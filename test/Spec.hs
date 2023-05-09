@@ -1,6 +1,6 @@
-import Lib (Grid, Row, boxes, cols, rows, solve, valid)
-import Test.Hspec
-import Test.QuickCheck
+import Lib (Grid, Row, boxes, cols, nodups, rows, solve, valid)
+import Test.Hspec (describe, hspec, it)
+import Test.QuickCheck (Gen, Property, elements, forAll, quickCheck, vectorOf)
 
 blank :: Grid
 blank = replicate 9 $ replicate 9 '.'
@@ -68,9 +68,13 @@ main = hspec $ do
       quickCheck prop_cols
     it "Applying boxes twice on a grid should be the same as applying identity" $ do
       quickCheck prop_boxes
+    it "Applying nodups to a row of 1..9 should return true" $ do
+      nodups ['1' .. '9']
+    it "Applying nodups to a row with a duplicate 9 should return false" $ do
+      not $ nodups $ '9' : ['1' .. '9']
     it "Solving the easy puzzle should produce one valid solution" $ do
-      print (solve easy)
+      print $ solve easy
     it "Solving the medium puzzle should produce one valid solution" $ do
-      print (solve medium)
+      print $ solve medium
     it "Solving the hard puzzle should produce one valid solution" $ do
-      print (solve hard)
+      print $ solve hard

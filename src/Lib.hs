@@ -1,4 +1,4 @@
-module Lib (Grid, Row, rows, cols, boxes, valid, solve) where
+module Lib (Grid, Row, rows, cols, boxes, valid, nodups, solve) where
 
 import Data.List (delete, transpose)
 
@@ -43,19 +43,19 @@ solve = filter valid . explode . fix prune . choices
 choices :: Grid -> Matrix Choices
 choices = map (map choice) where choice v = if v == '.' then ['1' .. '9'] else [v]
 
-cp :: [[a]] -> [[a]]
+cp :: [[a]] -> [[a]] -- cartesian product
 cp [] = [[]]
 cp (xs : xss) = [y : ys | y <- xs, ys <- cp xss]
 
-explode :: Matrix [a] -> [Matrix a]
+explode :: Matrix [a] -> [Matrix a] -- cartesian explosion of matrices
 explode m = cp (map cp m)
 
-prune :: Matrix Choices -> Matrix Choices
+prune :: Matrix Choices -> Matrix Choices -- reduce the problem space
 prune = pruneBy boxes . pruneBy cols . pruneBy rows
   where
     pruneBy f = f . map eliminate . f
-    process xs xss = if singleton xs then xs else foldr (delete . head) xs (filter singleton xss)
     eliminate xss = [process xs xss | xs <- xss]
+    process xs xss = if singleton xs then xs else foldr (delete . head) xs (filter singleton xss)
 
 fix :: Eq a => (a -> a) -> a -> a
 fix f x = if x == x' then x else fix f x' where x' = f x
