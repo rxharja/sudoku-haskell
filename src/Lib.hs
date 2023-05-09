@@ -43,19 +43,19 @@ solve = filter valid . explode . fix prune . choices
 choices :: Grid -> Matrix Choices
 choices = map (map choice) where choice v = if v == '.' then ['1' .. '9'] else [v]
 
+cp :: [[a]] -> [[a]]
+cp [] = [[]]
+cp (xs : xss) = [y : ys | y <- xs, ys <- cp xss]
+
 explode :: Matrix [a] -> [Matrix a]
 explode m = cp (map cp m)
-  where
-    cp [] = [[]]
-    cp (xs : xss) = [y : ys | y <- xs, ys <- cp xss]
 
 prune :: Matrix Choices -> Matrix Choices
 prune = pruneBy boxes . pruneBy cols . pruneBy rows
   where
     pruneBy f = f . map eliminate . f
-    eliminate xss =
-      let singles = (map head . filter singleton) xss
-       in [xs' | xs <- xss, let xs' = if singleton xs then xs else foldr delete xs singles]
+    process xs xss = if singleton xs then xs else foldr (delete . head) xs (filter singleton xss)
+    eliminate xss = [process xs xss | xs <- xss]
 
 fix :: Eq a => (a -> a) -> a -> a
 fix f x = if x == x' then x else fix f x' where x' = f x

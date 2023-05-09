@@ -18,6 +18,32 @@ easy =
     "4..25...."
   ]
 
+medium :: Grid
+medium =
+  [ ".1.42...5",
+    "..2.71.39",
+    ".......4.",
+    "2.71....6",
+    "....4....",
+    "6....74.3",
+    ".7.......",
+    "12.73.5..",
+    "3...82.7."
+  ]
+
+hard :: Grid
+hard =
+  [ ".9.7..86.",
+    ".31..5.2.",
+    "8.6......",
+    "..7.5...6",
+    "...3.7...",
+    "5...1.7..",
+    "......1.9",
+    ".2.6..35.",
+    ".54..8.7."
+  ]
+
 genRow :: Gen (Row Char)
 genRow = vectorOf 9 $ elements ('.' : ['1' .. '9'])
 
@@ -42,5 +68,9 @@ main = hspec $ do
       quickCheck prop_cols
     it "Applying boxes twice on a grid should be the same as applying identity" $ do
       quickCheck prop_boxes
-    it "Solving the easy solution should produce exactly one valid solution" $ do
+    it "Solving the easy puzzle should produce one valid solution" $ do
       print (solve easy)
+    it "Solving the medium puzzle should produce one valid solution" $ do
+      print (solve medium)
+    it "Solving the hard puzzle should produce one valid solution" $ do
+      print (solve hard)
