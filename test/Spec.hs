@@ -1,4 +1,5 @@
 import Lib (Grid, Row, boxes, cols, nodups, rows, solve, valid)
+import Data.List (intercalate)
 import Test.Hspec (describe, hspec, it)
 import Test.QuickCheck (Gen, Property, elements, forAll, quickCheck, vectorOf)
 
@@ -50,31 +51,55 @@ genRow = vectorOf 9 $ elements ('.' : ['1' .. '9'])
 genGrid :: Gen Grid
 genGrid = vectorOf 9 genRow
 
+prop_row :: Property
+prop_row = forAll genGrid $ (==) <*> rows
+
 prop_rows :: Property
 prop_rows = forAll genGrid $ (==) <*> rows . rows
+
+prop_col :: Property
+prop_col = forAll genGrid $ (/=) <*> cols
 
 prop_cols :: Property
 prop_cols = forAll genGrid $ (==) <*> cols . cols
 
+prop_box :: Property
+prop_box = forAll genGrid $ (/=) <*> boxes
+
 prop_boxes :: Property
 prop_boxes = forAll genGrid $ (==) <*> boxes . boxes
 
+format :: [[String]] -> IO ()
+format = putStrLn . intercalate "\n" . head 
+
 main :: IO ()
 main = hspec $ do
-  describe "Sudoku" $ do
-    it "Applying rows twice on a grid should be the same as applying identity" $ do
+  describe "Sudoku Row, Column, and Box Properties" $ do
+    it "Applying rows once on a grid SHOULD be the same as applying identity" $ do
+      quickCheck prop_row
+    it "Applying rows twice on a grid SHOULD be the same as applying identity" $ do
       quickCheck prop_rows
-    it "Applying cols twice on a grid should be the same as applying identity" $ do
+
+    it "Applying cols once on a grid SHOULD NOT be the same as applying identity" $ do
+      quickCheck prop_col
+    it "Applying cols twice on a grid SHOULD be the same as applying identity" $ do
       quickCheck prop_cols
-    it "Applying boxes twice on a grid should be the same as applying identity" $ do
+
+    it "Applying boxes once on a grid SHOULD NOT be the same as applying identity" $ do
+      quickCheck prop_box
+    it "Applying boxes twice on a grid SHOULD be the same as applying identity" $ do
       quickCheck prop_boxes
+  describe "Sudoku Function Validation" $ do
     it "Applying nodups to a row of 1..9 should return true" $ do
       nodups ['1' .. '9']
     it "Applying nodups to a row with a duplicate 9 should return false" $ do
-      not $ nodups $ '9' : ['1' .. '9']
+      not (nodups $ '9' : ['1' .. '9'])
+  describe "Solving Sudoku" $ do
     it "Solving the easy puzzle should produce one valid solution" $ do
-      print $ solve easy
+      format . solve $ easy
     it "Solving the medium puzzle should produce one valid solution" $ do
-      print $ solve medium
+      format . solve $ medium
     it "Solving the hard puzzle should produce one valid solution" $ do
-      print $ solve hard
+      format . solve $ hard
+    it "Solving the blank puzzle should produce at least one solution" $ do
+      format . solve $ blank
