@@ -1,4 +1,4 @@
-module Lib (Grid, Row, rows, cols, boxes, valid, nodups, solve) where
+module Lib (Grid, Row, Choices, rows, cols, boxes, valid, nodups, solve, void, safe, consistent) where
 
 import Data.List (delete, transpose)
 
@@ -59,3 +59,12 @@ prune = pruneBy boxes . pruneBy cols . pruneBy rows
 
 fix :: Eq a => (a -> a) -> a -> a
 fix f x = if x == x' then x else fix f x' where x' = f x
+
+void :: Matrix Choices -> Bool
+void = any (any null)
+
+consistent :: Row Choices -> Bool
+consistent = nodups . filter singleton
+
+safe :: Matrix Choices -> Bool
+safe m = and $ all consistent <$> ([rows, cols, boxes] <*> pure m)
