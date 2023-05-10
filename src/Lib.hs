@@ -37,9 +37,6 @@ nodups :: Eq a => [a] -> Bool
 nodups [] = True
 nodups (x : xs) = notElem x xs && nodups xs
 
-solve :: Grid -> [Grid]
-solve = filter valid . explode . fix prune . choices
-
 choices :: Grid -> Matrix Choices
 choices = map (map choice) where choice v = if v == '.' then ['1' .. '9'] else [v]
 
@@ -48,7 +45,7 @@ cp [] = [[]]
 cp (xs : xss) = [y : ys | y <- xs, ys <- cp xss]
 
 explode :: Matrix [a] -> [Matrix a] -- cartesian explosion of matrices
-explode m = cp (map cp m)
+explode = cp . map cp
 
 prune :: Matrix Choices -> Matrix Choices -- reduce the problem space
 prune = pruneBy boxes . pruneBy cols . pruneBy rows
@@ -56,9 +53,6 @@ prune = pruneBy boxes . pruneBy cols . pruneBy rows
     pruneBy f = f . map eliminate . f
     eliminate xss = [process xs xss | xs <- xss]
     process xs xss = if singleton xs then xs else foldr (delete . head) xs (filter singleton xss)
-
-fix :: Eq a => (a -> a) -> a -> a
-fix f x = if x == x' then x else fix f x' where x' = f x
 
 void :: Matrix Choices -> Bool
 void = any (any null)
@@ -68,3 +62,17 @@ consistent = nodups . filter singleton
 
 safe :: Matrix Choices -> Bool
 safe m = and $ all consistent <$> ([rows, cols, boxes] <*> pure m)
+
+blocked :: Matrix Choices -> Bool
+blocked m = void m || (not . safe) m
+
+search :: Matrix Choices -> [Grid]
+search m
+  | blocked m = []
+  | all (all singleton) m = explode m
+  | otherwise = [g | m' <- expand m, g <- search (prune m')]
+  where
+    expand = undefined
+
+solve :: Grid -> [Grid]
+solve = search . prune . choices

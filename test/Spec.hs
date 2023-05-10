@@ -1,6 +1,6 @@
 import Data.List (intercalate, nub)
 import Lib (Choices, Grid, Row, boxes, cols, consistent, nodups, rows, solve)
-import Test.Hspec (after, context, describe, hspec, it, shouldBe)
+import Test.Hspec (context, describe, hspec, it, shouldBe)
 import Test.QuickCheck (Arbitrary, Gen, Property, arbitrary, elements, forAll, property, suchThat, vectorOf)
 
 blank :: Grid
@@ -121,10 +121,9 @@ main = hspec $ do
     it "the easy puzzle should produce one valid solution" $ do
       let solutions = solve easy
       length solutions `shouldBe` 1
-
--- it "Solving the medium puzzle should produce one valid solution" $ do
---   format . solve $ medium
--- it "Solving the hard puzzle should produce one valid solution" $ do
---   format . solve $ hard
--- it "Solving the blank puzzle should produce at least one solution" $ do
---   format . solve $ blank
+    it "the medium puzzle should produce one valid solution" $ do
+      False
+    it "the hard puzzle should produce one valid solution" $ do
+      False
+    it "the blank puzzle should produce at least one valid solution" $ do
+      False
