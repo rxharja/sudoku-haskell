@@ -118,9 +118,11 @@ main = hspec $ do
         property $ forAll (genUniqList :: Gen (Row Choices)) consistent
 
   describe "Solving" $ do
+    let easySolution = solve easy
     it "the easy puzzle should produce one valid solution" $ do
-      let solutions = solve easy
-      length solutions `shouldBe` 1
+      length easySolution `shouldBe` 1
+    it ("the easy puzzle should be " ++ "x") $ do
+      show easySolution `shouldBe` ""
     it "the medium puzzle should produce one valid solution" $ do
       False
     it "the hard puzzle should produce one valid solution" $ do
