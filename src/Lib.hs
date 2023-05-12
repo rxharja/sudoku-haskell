@@ -1,6 +1,6 @@
-module Lib (Grid, Row, Choices, rows, cols, boxes, valid, nodups, solve, void, safe, consistent, replace) where
+module Lib (Grid, Row, Choices, rows, cols, boxes, valid, nodups, solve, void, safe, consistent, replace, format) where
 
-import Data.List (delete, findIndex, transpose)
+import Data.List (delete, findIndex, intercalate, transpose)
 import Data.Maybe (fromMaybe)
 
 type Grid = Matrix Value
@@ -86,3 +86,6 @@ replace xs ix v = take ix xs ++ [v] ++ drop (ix + 1) xs
 
 solve :: Grid -> [Grid]
 solve = search . prune . choices
+
+format :: [Grid] -> IO ()
+format = putStrLn . intercalate "\n" . head

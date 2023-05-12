@@ -113,9 +113,6 @@ prop_replace_valueChanged = forAll genRow $ \r -> do
   let newList = replace r x 'h'
   return $ (newList !! x) == 'h'
 
-format :: [[String]] -> IO ()
-format = putStrLn . intercalate "\n" . head
-
 main :: IO ()
 main = hspec $ do
   describe "row" $ do
@@ -171,14 +168,10 @@ main = hspec $ do
     it "the medium puzzle should produce one valid solution" $ do
       length solvedMedium `shouldBe` 1
 
-    let solvedHard = solve medium
+    let solvedHard = solve hard
     it "the hard puzzle should produce one valid solution" $ do
       length solvedHard `shouldBe` 1
-      format solvedHard
 
     let blanks = solve blank
     it "the blank puzzle should produce at least one valid solution" $ do
       length (take 2 blanks) > 1 `shouldBe` True
-      format (take 1 blanks)
-      putStrLn ""
-      format (take 1 . drop 1 $ blanks)
