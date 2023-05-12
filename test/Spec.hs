@@ -1,62 +1,8 @@
+import Boards (blank, easy, easySolution, hard, medium)
 import Data.List (intercalate, nub)
 import Lib (Choices, Grid, Row, boxes, cols, consistent, nodups, replace, rows, solve)
 import Test.Hspec (context, describe, hspec, it, shouldBe)
 import Test.QuickCheck (Arbitrary, Gen, Property, arbitrary, elements, forAll, property, suchThat, vectorOf)
-
-blank :: Grid
-blank = replicate 9 $ replicate 9 '.'
-
-easy :: Grid
-easy =
-  [ "2....1.38",
-    "........5",
-    ".7...6...",
-    ".......13",
-    ".981..257",
-    "31....8..",
-    "9..8...2.",
-    ".5..69784",
-    "4..25...."
-  ]
-
-easySolution :: Grid
-easySolution =
-  [ "249571638",
-    "861432975",
-    "573986142",
-    "725698413",
-    "698143257",
-    "314725869",
-    "937814526",
-    "152369784",
-    "486257391"
-  ]
-
-medium :: Grid
-medium =
-  [ ".1.42...5",
-    "..2.71.39",
-    ".......4.",
-    "2.71....6",
-    "....4....",
-    "6....74.3",
-    ".7.......",
-    "12.73.5..",
-    "3...82.7."
-  ]
-
-hard :: Grid
-hard =
-  [ ".9.7..86.",
-    ".31..5.2.",
-    "8.6......",
-    "..7.5...6",
-    "...3.7...",
-    "5...1.7..",
-    "......1.9",
-    ".2.6..35.",
-    ".54..8.7."
-  ]
 
 genInt :: Int -> Gen Int
 genInt x = elements [0 .. x]
