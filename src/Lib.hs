@@ -1,6 +1,7 @@
-module Lib (Grid, Row, Choices, rows, cols, boxes, valid, nodups, solve, void, safe, consistent) where
+module Lib (Grid, Row, Choices, rows, cols, boxes, valid, nodups, solve, void, safe, consistent, replace) where
 
-import Data.List (delete, transpose)
+import Data.List (delete, findIndex, transpose)
+import Data.Maybe (fromMaybe)
 
 type Grid = Matrix Value
 
@@ -72,7 +73,16 @@ search m
   | all (all singleton) m = explode m
   | otherwise = [g | m' <- expand m, g <- search (prune m')]
   where
-    expand = undefined
+    expand xss = fromMaybe [] $ do
+      ix <- findIndex (not . all singleton) xss
+      rs <- expandRow (xss !! ix)
+      return $ map (replace xss ix) rs
+    expandRow xss = do
+      ix <- findIndex (not . singleton) xss
+      return $ map (replace xss ix . pure) (xss !! ix)
+
+replace :: [a] -> Int -> a -> [a]
+replace xs ix v = take ix xs ++ [v] ++ drop (ix + 1) xs
 
 solve :: Grid -> [Grid]
 solve = search . prune . choices

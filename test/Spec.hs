@@ -1,5 +1,5 @@
 import Data.List (intercalate, nub)
-import Lib (Choices, Grid, Row, boxes, cols, consistent, nodups, rows, solve)
+import Lib (Choices, Grid, Row, boxes, cols, consistent, nodups, replace, rows, solve)
 import Test.Hspec (context, describe, hspec, it, shouldBe)
 import Test.QuickCheck (Arbitrary, Gen, Property, arbitrary, elements, forAll, property, suchThat, vectorOf)
 
@@ -17,6 +17,19 @@ easy =
     "9..8...2.",
     ".5..69784",
     "4..25...."
+  ]
+
+easySolution :: Grid
+easySolution =
+  [ "249571638",
+    "861432975",
+    "573986142",
+    "725698413",
+    "698143257",
+    "314725869",
+    "937814526",
+    "152369784",
+    "486257391"
   ]
 
 medium :: Grid
@@ -44,6 +57,9 @@ hard =
     ".2.6..35.",
     ".54..8.7."
   ]
+
+genInt :: Int -> Gen Int
+genInt x = elements [0 .. x]
 
 genRow :: Gen (Row Char)
 genRow = vectorOf 9 $ elements ('.' : ['1' .. '9'])
@@ -78,6 +94,24 @@ prop_box = forAll genGrid $ (/=) <*> boxes
 
 prop_boxes :: Property
 prop_boxes = forAll genGrid $ (==) <*> boxes . boxes
+
+prop_replace_tailsMatch :: Property
+prop_replace_tailsMatch = forAll genRow $ \r -> do
+  x <- genInt (length r)
+  let newList = replace r x 'h'
+  return $ drop (x + 1) r == drop (x + 1) newList
+
+prop_replace_headsMatch :: Property
+prop_replace_headsMatch = forAll genRow $ \r -> do
+  x <- genInt (length r)
+  let newList = replace r x 'h'
+  return $ take x r == take x newList
+
+prop_replace_valueChanged :: Property
+prop_replace_valueChanged = forAll genRow $ \r -> do
+  x <- genInt (length r)
+  let newList = replace r x 'h'
+  return $ (newList !! x) == 'h'
 
 format :: [[String]] -> IO ()
 format = putStrLn . intercalate "\n" . head
@@ -117,15 +151,34 @@ main = hspec $ do
       it "unique values should return true" $ do
         property $ forAll (genUniqList :: Gen (Row Choices)) consistent
 
+  describe "replace" $ do
+    context "when applied to a list" $ do
+      it "should return a new list with a new value at the chosen index" $ do
+        property prop_replace_valueChanged
+      it "should return a new list that has the same tail as the original from the given index" $ do
+        property prop_replace_tailsMatch
+      it "should return a new list that has the same head as the original from the given index" $ do
+        property prop_replace_headsMatch
+
   describe "Solving" $ do
-    let easySolution = solve easy
+    let solvedEasy = solve easy
     it "the easy puzzle should produce one valid solution" $ do
-      length easySolution `shouldBe` 1
-    it ("the easy puzzle should be " ++ "x") $ do
-      show easySolution `shouldBe` ""
+      length solvedEasy `shouldBe` 1
+    it ("the easy puzzle should be " ++ show (intercalate "\n" easySolution)) $ do
+      show solvedEasy `shouldBe` show [easySolution]
+
+    let solvedMedium = solve medium
     it "the medium puzzle should produce one valid solution" $ do
-      False
+      length solvedMedium `shouldBe` 1
+
+    let solvedHard = solve medium
     it "the hard puzzle should produce one valid solution" $ do
-      False
+      length solvedHard `shouldBe` 1
+      format solvedHard
+
+    let blanks = solve blank
     it "the blank puzzle should produce at least one valid solution" $ do
-      False
+      length (take 2 blanks) > 1 `shouldBe` True
+      format (take 1 blanks)
+      putStrLn ""
+      format (take 1 . drop 1 $ blanks)
